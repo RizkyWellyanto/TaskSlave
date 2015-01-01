@@ -2,8 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_new_task"
+        android:id="@+id/action_add_new_task"
         android:icon="@drawable/ic_action_new_task"
         android:title="@string/action_new_task"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_accept"
+        android:icon="@drawable/ic_action_accept"
+        android:title="@string/action_accept"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_edit_task"
+        android:icon="@drawable/ic_action_edit_task"
+        android:title="@string/action_edit_task"
         app:showAsAction="always" />
 </menu>

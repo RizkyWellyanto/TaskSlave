@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.app.ListFragment;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
 
@@ -57,15 +58,18 @@ public class TaskListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //super.onListItemClick(l, v, position, id);
-
-        Log.e("DEBUG","onListItemClick is called");
+        super.onListItemClick(l, v, position, id);
 
         if (null != mListener) {
-            Log.e("DEBUG","about to call mListener.onTaskSelected");
             mListener.onTaskSelected(position);
-            Log.e("DEBUG","mListener.onTaskSelected is called");
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mListener.onTaskListFragment();
     }
 
     public void notifyAdapter(){
@@ -74,5 +78,6 @@ public class TaskListFragment extends ListFragment {
 
     public interface OnTaskListFragmentInteractionListener {
         public void onTaskSelected(int position);
+        public void onTaskListFragment();
     }
 }

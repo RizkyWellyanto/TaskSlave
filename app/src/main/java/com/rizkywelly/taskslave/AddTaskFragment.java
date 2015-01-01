@@ -31,6 +31,8 @@ public class AddTaskFragment extends Fragment{
     TextView textViewTitle, textViewDescription;
     EditText editTextTitle, editTextDescription;
 
+    OnAddTaskFragmentInteractionListener mListener;
+
     public AddTaskFragment() {
         // Required empty public constructor
     }
@@ -38,6 +40,12 @@ public class AddTaskFragment extends Fragment{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        try {
+            mListener = (OnAddTaskFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -62,6 +70,19 @@ public class AddTaskFragment extends Fragment{
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editTextTitle, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mListener.onAddTaskFragment();
     }
 
     protected boolean setNewTask() {
@@ -90,5 +111,9 @@ public class AddTaskFragment extends Fragment{
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editTextTitle.getWindowToken(), 0);
+    }
+
+    public interface OnAddTaskFragmentInteractionListener{
+        public void onAddTaskFragment();
     }
 }
