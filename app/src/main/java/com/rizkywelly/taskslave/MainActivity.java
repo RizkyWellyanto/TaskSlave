@@ -1,10 +1,12 @@
 package com.rizkywelly.taskslave;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,7 +17,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     FragmentManager mFragManager = getFragmentManager();
     AddTaskFragment mAddTaskFragment = new AddTaskFragment();
     TaskListFragment mTaskListFragment = new TaskListFragment();
-    TaskDetailFragment mTaskDetailFragment;
+    TaskDetailFragment mTaskDetailFragment = new TaskDetailFragment()   ;
 
     MenuItem mMenuItemNewTask, mMenuItemEditTask, mMenuItemAccept;
 
@@ -67,10 +69,26 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
                 return true;
 
             case R.id.action_accept:
-                if (mAddTaskFragment.setNewTask()) {
 
-                    mTaskList.add(mAddTaskFragment.getTask());
-                    mAddTaskFragment.clear();
+                if (mAddTaskFragment.isResumed()){
+                    if (mAddTaskFragment.setNewTask()) {
+
+                        mTaskList.add(mAddTaskFragment.getTask());
+                        mAddTaskFragment.clear();
+                        mTaskListFragment.notifyAdapter();
+
+                        mFragManager.popBackStackImmediate();
+                        fragmentTransaction = mFragManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
+                        fragmentTransaction.commit();
+
+                        switchMenuItem(R.id.action_add_new_task);
+                    }
+                }
+
+
+                if(mTaskDetailFragment.isResumed()){
+                    mTaskList.set(mTaskDetailFragment.getPosition(),mAddTaskFragment.getTask());
                     mTaskListFragment.notifyAdapter();
 
                     mFragManager.popBackStackImmediate();
@@ -80,12 +98,13 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
                     switchMenuItem(R.id.action_add_new_task);
                 }
+
                 return true;
 
             case R.id.action_edit_task:
-                // show edittexts
+                mTaskDetailFragment.enableTaskEdit();
 
-                // show accept menu item
+                switchMenuItem(R.id.action_accept);
 
                 return true;
 
@@ -106,11 +125,11 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
     @Override
     public void onTaskSelected(int position) {
-        mTaskDetailFragment = TaskDetailFragment.newInstance(mTaskList.get(position),position);
+        mTaskDetailFragment = TaskDetailFragment.newInstance(new Task(mTaskList.get(position)),new Integer(position));
 
         FragmentTransaction fragmentTransaction = mFragManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_activity_layout, mTaskDetailFragment, AddTaskFragment.TAG);
-        fragmentTransaction.addToBackStack(AddTaskFragment.TAG);
+        fragmentTransaction.replace(R.id.main_activity_layout, mTaskDetailFragment, TaskDetailFragment.TAG);
+        fragmentTransaction.addToBackStack(TaskDetailFragment.TAG);
         fragmentTransaction.commit();
 
         switchMenuItem(R.id.action_edit_task);

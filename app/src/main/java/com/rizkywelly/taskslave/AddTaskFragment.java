@@ -26,7 +26,7 @@ import static com.rizkywelly.taskslave.Task.TITLE_ERROR_MESSAGE;
 public class AddTaskFragment extends Fragment{
     static final String TAG = "addTaskFragment";
 
-    Task mTask = new Task();
+    private Task mTask = new Task();
 
     TextView textViewTitle, textViewDescription;
     EditText editTextTitle, editTextDescription;

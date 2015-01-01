@@ -1,19 +1,27 @@
 package com.rizkywelly.taskslave;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 
 public class TaskDetailFragment extends Fragment {
+    static final String TAG = "TASK_DETAIL_FRAGMENT";
     static final String TASK_KEY = "task_key";
     static final String POSITION_KEY = "position_key";
 
-    Task mTask;
-    int mPosition;
+    private Task mTask;
+    private int mPosition;
+
+    TextView textViewTitle, textViewTaskTitle, textViewDescription, textViewTaskDescription;
+    EditText editTextTitle, editTextDescription;
 
     OnTaskDetailFragmentInteractionListener mListener;
 
@@ -38,8 +46,8 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mTask = getArguments().getParcelable(TASK_KEY);
-        mPosition = getArguments().getInt(POSITION_KEY);
+        mTask = new Task((Task)getArguments().getParcelable(TASK_KEY));
+        mPosition = new Integer(getArguments().getInt(POSITION_KEY));
 
         return inflater.inflate(R.layout.fragment_task_detail_layout, container, false);
     }
@@ -47,6 +55,20 @@ public class TaskDetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        textViewTitle = (TextView) view.findViewById(R.id.text_view_title);
+        textViewDescription = (TextView) view.findViewById(R.id.text_view_description);
+        textViewTaskTitle = (TextView) view.findViewById(R.id.text_view_task_title);
+        textViewTaskDescription = (TextView) view.findViewById(R.id.text_view_task_description);
+
+        editTextTitle = (EditText) view.findViewById(R.id.edit_text_title);
+        editTextDescription = (EditText) view.findViewById(R.id.edit_text_task_description);
+
+        textViewTaskTitle.setText(mTask.getTitle());
+        textViewTaskDescription.setText(mTask.getDescription());
+
+        editTextTitle.setText(mTask.getTitle());
+        editTextDescription.setText(mTask.getDescription());
 
         mListener.onTaskDetailFragment();
     }
@@ -70,6 +92,27 @@ public class TaskDetailFragment extends Fragment {
 
     public interface OnTaskDetailFragmentInteractionListener {
         public void onTaskDetailFragment();
+    }
+
+    public void enableTaskEdit(){
+        textViewTaskTitle.setVisibility(View.GONE);
+        textViewTaskDescription.setVisibility(View.GONE);
+
+        editTextTitle.setVisibility(View.VISIBLE);
+        editTextDescription.setVisibility(View.VISIBLE);
+
+        editTextTitle.requestFocus();
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editTextTitle, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public int getPosition(){
+        return mPosition;
+    }
+
+    public Task getTask(){
+        return new Task(mTask);
     }
 
 }
