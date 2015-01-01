@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TaskSlave</string>
+    <string name="add_task">Add Task</string>
+    <string name="task_title">Title</string>
+    <string name="task_description">Description</string>
+    <string name="action_new_task">New Task</string>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+</resources>
