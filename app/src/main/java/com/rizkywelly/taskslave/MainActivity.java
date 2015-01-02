@@ -3,13 +3,18 @@ package com.rizkywelly.taskslave;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements TaskListFragment.OnTaskListFragmentInteractionListener, AddTaskFragment.OnAddTaskFragmentInteractionListener, TaskDetailFragment.OnTaskDetailFragmentInteractionListener {
@@ -17,15 +22,17 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     FragmentManager mFragManager = getFragmentManager();
     AddTaskFragment mAddTaskFragment = new AddTaskFragment();
     TaskListFragment mTaskListFragment = new TaskListFragment();
-    TaskDetailFragment mTaskDetailFragment = new TaskDetailFragment()   ;
+    TaskDetailFragment mTaskDetailFragment = new TaskDetailFragment();
 
-    MenuItem mMenuItemNewTask, mMenuItemEditTask, mMenuItemAccept;
+    MenuItem mMenuItemNewTask, mMenuItemEditTask, mMenuItemAccept, mMenuItemDeleteTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main_layout);
+
+        loadTaskData();
 
         FragmentTransaction fragmentTransaction = mFragManager.beginTransaction();
         fragmentTransaction.add(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
@@ -37,7 +44,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     protected void onPause() {
         super.onPause();
 
-        // save the tasks list here
+        saveTaskData();
     }
 
     @Override
@@ -49,6 +56,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
         mMenuItemNewTask = menu.findItem(R.id.action_add_new_task);
         mMenuItemEditTask = menu.findItem(R.id.action_edit_task);
         mMenuItemAccept = menu.findItem(R.id.action_accept);
+        mMenuItemDeleteTask = menu.findItem(R.id.action_delete_task);
 
         switchMenuItem(R.id.action_add_new_task);
 
@@ -69,8 +77,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
                 return true;
 
             case R.id.action_accept:
-
-                if (mAddTaskFragment.isResumed()){
+                if (mAddTaskFragment.isResumed()) {
                     if (mAddTaskFragment.setNewTask()) {
 
                         mTaskList.add(mAddTaskFragment.getTask());
@@ -86,17 +93,18 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
                     }
                 }
 
+                if (mTaskDetailFragment.isResumed()) {
+                    if (mTaskDetailFragment.setNewTask()) {
+                        mTaskList.set(mTaskDetailFragment.getPosition(), mTaskDetailFragment.getTask());
+                        mTaskListFragment.notifyAdapter();
 
-                if(mTaskDetailFragment.isResumed()){
-                    mTaskList.set(mTaskDetailFragment.getPosition(),mAddTaskFragment.getTask());
-                    mTaskListFragment.notifyAdapter();
+                        mFragManager.popBackStackImmediate();
+                        fragmentTransaction = mFragManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
+                        fragmentTransaction.commit();
 
-                    mFragManager.popBackStackImmediate();
-                    fragmentTransaction = mFragManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
-                    fragmentTransaction.commit();
-
-                    switchMenuItem(R.id.action_add_new_task);
+                        switchMenuItem(R.id.action_add_new_task);
+                    }
                 }
 
                 return true;
@@ -108,6 +116,20 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
                 return true;
 
+            case R.id.action_delete_task:
+                mTaskList.remove(mTaskDetailFragment.getPosition());
+                Toast.makeText(this,mTaskDetailFragment.getDeleteMessage(),Toast.LENGTH_SHORT).show();
+                mTaskListFragment.notifyAdapter();
+
+                mFragManager.popBackStackImmediate();
+                fragmentTransaction = mFragManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
+                fragmentTransaction.commit();
+
+                switchMenuItem(R.id.action_add_new_task);
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -116,6 +138,14 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     @Override
     public void onBackPressed() {
         if (mFragManager.getBackStackEntryCount() > 1) {
+            FragmentManager.BackStackEntry backStackEntry = mFragManager.getBackStackEntryAt(mFragManager.getBackStackEntryCount() - 1);
+
+            if (backStackEntry.getName().equals(AddTaskFragment.TAG)) {
+                switchMenuItem(R.id.action_add_new_task);
+            } else if (backStackEntry.getName().equals(TaskDetailFragment.TAG)) {
+                switchMenuItem(R.id.action_add_new_task);
+            }
+
             mFragManager.popBackStackImmediate();
             mFragManager.beginTransaction().commit();
         } else {
@@ -125,7 +155,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
     @Override
     public void onTaskSelected(int position) {
-        mTaskDetailFragment = TaskDetailFragment.newInstance(new Task(mTaskList.get(position)),new Integer(position));
+        mTaskDetailFragment = TaskDetailFragment.newInstance(new Task(mTaskList.get(position)), new Integer(position));
 
         FragmentTransaction fragmentTransaction = mFragManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_activity_layout, mTaskDetailFragment, TaskDetailFragment.TAG);
@@ -133,21 +163,22 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
         fragmentTransaction.commit();
 
         switchMenuItem(R.id.action_edit_task);
+        mMenuItemDeleteTask.setVisible(true);
     }
 
     @Override
     public void onTaskListFragment() {
-
+        // for future development
     }
 
     @Override
     public void onAddTaskFragment() {
-
+        // for future development
     }
 
     @Override
     public void onTaskDetailFragment() {
-
+        // for future development
     }
 
     public void switchMenuItem(int uri) {
@@ -156,19 +187,50 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
                 mMenuItemNewTask.setVisible(true);
                 mMenuItemEditTask.setVisible(false);
                 mMenuItemAccept.setVisible(false);
+                mMenuItemDeleteTask.setVisible(false);
                 break;
 
             case R.id.action_edit_task:
                 mMenuItemNewTask.setVisible(false);
                 mMenuItemEditTask.setVisible(true);
                 mMenuItemAccept.setVisible(false);
+                mMenuItemDeleteTask.setVisible(false);
                 break;
 
             case R.id.action_accept:
                 mMenuItemNewTask.setVisible(false);
                 mMenuItemEditTask.setVisible(false);
                 mMenuItemAccept.setVisible(true);
+                mMenuItemDeleteTask.setVisible(false);
                 break;
+        }
+    }
+
+    public void loadTaskData(){
+
+    }
+
+    public void saveTaskData(){
+        String FILENAME = "hello_file";
+        String string = "hello world!";
+
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+
+            try {
+                fos.write(string.getBytes());
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

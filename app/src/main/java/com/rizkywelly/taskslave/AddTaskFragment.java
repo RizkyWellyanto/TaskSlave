@@ -24,7 +24,7 @@ import static com.rizkywelly.taskslave.Task.TITLE_ERROR_MESSAGE;
  * A simple {@link Fragment} subclass.
  */
 public class AddTaskFragment extends Fragment{
-    static final String TAG = "addTaskFragment";
+    static final String TAG = "add_task_fragment";
 
     private Task mTask = new Task();
 
@@ -67,6 +67,7 @@ public class AddTaskFragment extends Fragment{
         editTextDescription = (EditText) view.findViewById(R.id.edit_text_task_description);
 
         editTextTitle.requestFocus();
+        editTextTitle.setSelection(editTextTitle.getText().length());
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editTextTitle, InputMethodManager.SHOW_IMPLICIT);
@@ -87,11 +88,12 @@ public class AddTaskFragment extends Fragment{
 
     protected boolean setNewTask() {
         if (!mTask.setTitle(editTextTitle.getText().toString())) {
-            Toast.makeText(getActivity().getApplicationContext(), TITLE_ERROR_MESSAGE, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), TITLE_ERROR_MESSAGE, Toast.LENGTH_SHORT).show();
             return false;
         }
 
         mTask.setDescription(editTextDescription.getText().toString());
+        Toast.makeText(getActivity(), mTask.getTitle() + " is created.", Toast.LENGTH_SHORT).show();
 
         return true;
     }

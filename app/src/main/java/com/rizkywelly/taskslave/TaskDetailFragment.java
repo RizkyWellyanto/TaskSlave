@@ -11,9 +11,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static com.rizkywelly.taskslave.Task.TITLE_ERROR_MESSAGE;
 
 public class TaskDetailFragment extends Fragment {
-    static final String TAG = "TASK_DETAIL_FRAGMENT";
+    static final String TAG = "task_detail_fragment";
     static final String TASK_KEY = "task_key";
     static final String POSITION_KEY = "position_key";
 
@@ -74,6 +77,14 @@ public class TaskDetailFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editTextTitle.getWindowToken(), 0);
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -102,6 +113,7 @@ public class TaskDetailFragment extends Fragment {
         editTextDescription.setVisibility(View.VISIBLE);
 
         editTextTitle.requestFocus();
+        editTextTitle.setSelection(editTextTitle.getText().length());
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editTextTitle, InputMethodManager.SHOW_IMPLICIT);
@@ -115,4 +127,18 @@ public class TaskDetailFragment extends Fragment {
         return new Task(mTask);
     }
 
+    protected boolean setNewTask() {
+        if (!mTask.setTitle(editTextTitle.getText().toString())) {
+            Toast.makeText(getActivity().getApplicationContext(), TITLE_ERROR_MESSAGE, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        mTask.setDescription(editTextDescription.getText().toString());
+
+        return true;
+    }
+
+    public String getDeleteMessage(){
+        return mTask.getTitle() + " is deleted.";
+    }
 }

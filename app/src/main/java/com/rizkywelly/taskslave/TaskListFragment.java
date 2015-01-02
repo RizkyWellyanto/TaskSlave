@@ -15,7 +15,7 @@ import android.widget.ListView;
  * interface.
  */
 public class TaskListFragment extends ListFragment {
-    static final String TAG = "taskListFragment";
+    static final String TAG = "task_list_fragment";
     static final String EMPTY_MESSAGE= "You don\'t have any Task in your list. Click the add task button on the upper right corner to add a new task.";
 
     private OnTaskListFragmentInteractionListener mListener;
