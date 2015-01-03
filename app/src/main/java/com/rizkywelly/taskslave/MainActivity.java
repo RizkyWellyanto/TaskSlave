@@ -1,10 +1,8 @@
 package com.rizkywelly.taskslave;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,14 +10,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements TaskListFragment.OnTaskListFragmentInteractionListener, AddTaskFragment.OnAddTaskFragmentInteractionListener, TaskDetailFragment.OnTaskDetailFragmentInteractionListener {
+    static final String FILENAME = "TaskList.txt";
+
     ArrayList<Task> mTaskList = new ArrayList<Task>();
+
     FragmentManager mFragManager = getFragmentManager();
+
     AddTaskFragment mAddTaskFragment = new AddTaskFragment();
     TaskListFragment mTaskListFragment = new TaskListFragment();
     TaskDetailFragment mTaskDetailFragment = new TaskDetailFragment();
@@ -32,7 +43,11 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
         setContentView(R.layout.activity_main_layout);
 
-        loadTaskData();
+        try{
+            mTaskList = loadTaskData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         FragmentTransaction fragmentTransaction = mFragManager.beginTransaction();
         fragmentTransaction.add(R.id.main_activity_layout, mTaskListFragment, TaskListFragment.TAG);
@@ -44,7 +59,11 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
     protected void onPause() {
         super.onPause();
 
-        saveTaskData();
+        try{
+            saveTaskData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -118,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
 
             case R.id.action_delete_task:
                 mTaskList.remove(mTaskDetailFragment.getPosition());
-                Toast.makeText(this,mTaskDetailFragment.getDeleteMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, mTaskDetailFragment.getDeleteMessage(), Toast.LENGTH_SHORT).show();
                 mTaskListFragment.notifyAdapter();
 
                 mFragManager.popBackStackImmediate();
@@ -206,31 +225,62 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
         }
     }
 
-    public void loadTaskData(){
-
-    }
-
-    public void saveTaskData(){
-        String FILENAME = "hello_file";
-        String string = "hello world!";
-
-        FileOutputStream fos = null;
+    public ArrayList<Task> loadTaskData() {
+        String data = "";
+        int ch;
+        StringBuffer fileContent = new StringBuffer("");
+        FileInputStream fis;
         try {
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-
+            fis = openFileInput(FILENAME);
             try {
-                fos.write(string.getBytes());
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                while ((ch = fis.read()) != -1)
+                    fileContent.append((char) ch);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
 
+            File file = new File(getFilesDir(), FILENAME);
+            Log.e("DEBUG", file.toString());
+        }
+
+        data = new String(fileContent);
+
+        return convertJSONToTaskList(data);
+    }
+
+    public void saveTaskData() {
+        String data = convertTaskListToJSON();
+
+        FileOutputStream fos;
+
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            try {
+                fos.write(data.getBytes());
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public String convertTaskListToJSON() {
+        Gson gson = new Gson();
+
+        String taskListJSON = gson.toJson(mTaskList.toArray());
+
+        return taskListJSON;
+    }
+
+    public ArrayList<Task> convertJSONToTaskList(String taskListJson){
+        Gson gson = new Gson();
+
+        ArrayList<Task> taskListArrayList = gson.fromJson(taskListJson, new TypeToken<List<Task>>(){}.getType());
+
+        return taskListArrayList;
     }
 }
