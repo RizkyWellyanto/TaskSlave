@@ -4,14 +4,34 @@
         <item name="actionBarStyle">@style/ActionbarStyle</item>
         <item name="elevation">0dp</item>
         <item name="android:windowContentOverlay">@null</item>
-
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
+        <!--<item name="android:checkboxStyle">@style/CheckBoxStyle</item>-->
     </style>
 
     <!--Action Bar Style-->
     <style name="ActionbarStyle" parent="Widget.AppCompat.ActionBar.Solid">
         <item name="background">@drawable/ab_solid</item>
         <item name="android:background">@drawable/ab_solid</item>
-        <item name="android:colorBackground">#000000</item>
+    </style>
+
+    <!--Text View Style-->
+    <style name="TextViewStyle">
+        <item name="android:fontFamily">sans-seriff</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--Edit Text Style-->
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:fontFamily">sans-seriff</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:color">@color/grey</item>
+    </style>
+
+    <!--Check Box Style-->
+    <style name="CheckBoxStyle" parent="Widget.AppCompat.ActionButton">
+
     </style>
 
 </resources>
