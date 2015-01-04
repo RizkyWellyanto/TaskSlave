@@ -106,8 +106,8 @@ public class TaskDetailFragment extends Fragment {
     }
 
     public void enableTaskEdit(){
-        textViewTaskTitle.setVisibility(View.GONE);
-        textViewTaskDescription.setVisibility(View.GONE);
+        textViewTaskTitle.setVisibility(View.INVISIBLE);
+        textViewTaskDescription.setVisibility(View.INVISIBLE);
 
         editTextTitle.setVisibility(View.VISIBLE);
         editTextDescription.setVisibility(View.VISIBLE);

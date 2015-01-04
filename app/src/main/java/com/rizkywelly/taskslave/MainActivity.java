@@ -242,7 +242,6 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
             e.printStackTrace();
 
             File file = new File(getFilesDir(), FILENAME);
-            Log.e("DEBUG", file.toString());
         }
 
         data = new String(fileContent);
