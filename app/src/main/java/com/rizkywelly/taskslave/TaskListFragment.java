@@ -6,7 +6,9 @@ import android.app.ListFragment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * A fragment representing a list of Items.

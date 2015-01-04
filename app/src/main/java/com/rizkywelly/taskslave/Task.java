@@ -16,22 +16,26 @@ public class Task implements Parcelable {
 
     protected String title;
     protected String description;
+    protected boolean isDone;
 
     public Task() {
         this.title = DEFAULT_TITLE;
         this.description = DEFAULT_DESCRIPTION;
+        this.isDone = false;
     }
 
     public Task(Task task) {
         this();
         setTitle(task.getTitle());
         setDescription(task.getDescription());
+        setStatus(task.getStatus());
     }
 
     public Task(Parcel parcel) {
         this();
         setTitle(parcel.readString());
         setDescription(parcel.readString());
+        setStatus(parcel.readByte() != 0);
     }
 
     public Task(String title, String description) {
@@ -58,6 +62,14 @@ public class Task implements Parcelable {
         return false;
     }
 
+    public void setStatus(boolean input){
+        this.isDone = input;
+    }
+
+    public boolean getStatus(){
+        return this.isDone;
+    }
+
     public String getTitle() {
         return this.title;
     }
@@ -79,6 +91,7 @@ public class Task implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.title);
         dest.writeString(this.description);
+        dest.writeByte((byte) (this.isDone ? 1 : 0));
     }
 
     public static Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {

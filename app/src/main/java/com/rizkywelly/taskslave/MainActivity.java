@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements TaskListFragment.OnTaskListFragmentInteractionListener, AddTaskFragment.OnAddTaskFragmentInteractionListener, TaskDetailFragment.OnTaskDetailFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity implements TaskListFragment.OnTaskListFragmentInteractionListener, AddTaskFragment.OnAddTaskFragmentInteractionListener, TaskDetailFragment.OnTaskDetailFragmentInteractionListener, TaskAdapter.OnAdapterInteractionListener {
     static final String FILENAME = "TaskList.txt";
 
     ArrayList<Task> mTaskList = new ArrayList<Task>();
@@ -282,5 +282,10 @@ public class MainActivity extends ActionBarActivity implements TaskListFragment.
         ArrayList<Task> taskListArrayList = gson.fromJson(taskListJson, new TypeToken<List<Task>>(){}.getType());
 
         return taskListArrayList;
+    }
+
+    @Override
+    public void onCheckBoxClicked(int position, boolean status) {
+        mTaskList.get(position).setStatus(status);
     }
 }
