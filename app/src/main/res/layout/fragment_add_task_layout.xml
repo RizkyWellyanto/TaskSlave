@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.rizkywelly.taskslave.AddTaskFragment"
-    android:id="@+id/fragment_add_task_layout">
+    android:id="@+id/fragment_add_task_layout"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
     <TextView
         android:id="@+id/text_view_title"
