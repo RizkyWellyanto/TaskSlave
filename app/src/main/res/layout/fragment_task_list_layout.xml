@@ -21,6 +21,7 @@
         android:layout_width="0dip"
         android:layout_height="64dip"
         android:layout_weight="0.15"
-        android:focusable="false"/>
+        android:focusable="false"
+        android:button="@drawable/custom_drawable_checkbox"/>
 
 </LinearLayout>
